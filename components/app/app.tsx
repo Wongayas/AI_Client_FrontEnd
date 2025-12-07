@@ -38,7 +38,6 @@ export function App({ appConfig }: AppProps) {
       typeof process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT === 'string'
         ? process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT
         : '/api/connection-details';
-    const endpoint2 = 'http://localhost:8080/getToken'; // for local testing
 
     // Create a custom TokenSource so we can include client-selected options (like voice, personality, language)
     return TokenSource.custom(async () => {
