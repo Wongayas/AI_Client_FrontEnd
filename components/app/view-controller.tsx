@@ -29,9 +29,27 @@ const VIEW_MOTION_PROPS = {
 
 interface ViewControllerProps {
   appConfig: AppConfig;
+  userName?: string;
+  setUserName?: (v: string) => void;
+  selectedVoice?: string;
+  setSelectedVoice?: (v: string | undefined) => void;
+  selectedPersonality?: string;
+  setSelectedPersonality?: (v: string | undefined) => void;
+  selectedLanguage?: string;
+  setSelectedLanguage?: (v: string | undefined) => void;
 }
 
-export function ViewController({ appConfig }: ViewControllerProps) {
+export function ViewController({
+  appConfig,
+  userName,
+  setUserName,
+  selectedVoice,
+  setSelectedVoice,
+  selectedPersonality,
+  setSelectedPersonality,
+  selectedLanguage,
+  setSelectedLanguage,
+}: ViewControllerProps) {
   const { isConnected, start } = useSessionContext();
 
   return (
@@ -43,6 +61,14 @@ export function ViewController({ appConfig }: ViewControllerProps) {
           {...VIEW_MOTION_PROPS}
           startButtonText={appConfig.startButtonText}
           onStartCall={start}
+          userName={userName}
+          onUserNameChange={setUserName}
+          voice={selectedVoice}
+          onVoiceChange={setSelectedVoice}
+          personality={selectedPersonality}
+          onPersonalityChange={setSelectedPersonality}
+          language={selectedLanguage}
+          onLanguageChange={setSelectedLanguage}
         />
       )}
       {/* Session view */}

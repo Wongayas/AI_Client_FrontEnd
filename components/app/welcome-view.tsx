@@ -1,4 +1,8 @@
+'use client';
+
+import React, { useState } from 'react';
 import { Button } from '@/components/livekit/button';
+import Dropdown from '@/components/ui/dropdown';
 
 function WelcomeImage() {
   return (
@@ -21,11 +25,27 @@ function WelcomeImage() {
 interface WelcomeViewProps {
   startButtonText: string;
   onStartCall: () => void;
+  userName?: string | undefined;
+  onUserNameChange?: (v: string) => void;
+  voice?: string | undefined;
+  onVoiceChange?: (v: string | undefined) => void;
+  personality?: string | undefined;
+  onPersonalityChange?: (v: string | undefined) => void;
+  language?: string | undefined;
+  onLanguageChange?: (v: string | undefined) => void;
 }
 
 export const WelcomeView = ({
   startButtonText,
   onStartCall,
+  userName,
+  onUserNameChange,
+  voice,
+  onVoiceChange,
+  personality,
+  onPersonalityChange,
+  language,
+  onLanguageChange,
   ref,
 }: React.ComponentProps<'div'> & WelcomeViewProps) => {
   return (
@@ -36,6 +56,54 @@ export const WelcomeView = ({
         <p className="text-foreground max-w-prose pt-1 leading-6 font-medium">
           Chat live with your voice AI agent
         </p>
+
+        <div className="mt-4 w-full max-w-md">
+          <label className="text-muted-foreground mb-1 block text-sm font-medium">Your Name</label>
+          <input
+            type="text"
+            placeholder="Enter your name"
+            value={userName || ''}
+            onChange={(e) => onUserNameChange?.(e.target.value)}
+            className="bg-background text-foreground placeholder-muted-foreground focus:ring-primary w-full rounded-md border px-3 py-2 focus:ring-2 focus:outline-none"
+          />
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+          <Dropdown
+            label="Voice"
+            options={[
+              { label: 'Alloy (default)', value: 'alloy' },
+              { label: 'Ava (bright)', value: 'ava' },
+              { label: 'Deep (rich)', value: 'deep' },
+            ]}
+            value={voice}
+            onChange={(v) => onVoiceChange?.(v)}
+          />
+
+          <Dropdown
+            label="Personality"
+            options={[
+              { label: 'Helpful', value: 'helpful' },
+              { label: 'Formal', value: 'formal' },
+              { label: 'Casual', value: 'casual' },
+              { label: 'Humorous', value: 'humorous' },
+            ]}
+            value={personality}
+            onChange={(v) => onPersonalityChange?.(v)}
+          />
+
+          <Dropdown
+            label="Language"
+            options={[
+              { label: 'English', value: 'en' },
+              { label: 'Spanish', value: 'es' },
+              { label: 'French', value: 'fr' },
+              { label: 'German', value: 'de' },
+            ]}
+            value={language}
+            onChange={(v) => onLanguageChange?.(v)}
+          />
+        </div>
 
         <Button variant="primary" size="lg" onClick={onStartCall} className="mt-6 w-64 font-mono">
           {startButtonText}
