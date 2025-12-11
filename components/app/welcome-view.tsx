@@ -64,6 +64,8 @@ export const WelcomeView = ({
             placeholder="Enter your name"
             value={userName || ''}
             onChange={(e) => onUserNameChange?.(e.target.value)}
+            required
+            aria-required="true"
             className="bg-background text-foreground placeholder-muted-foreground focus:ring-primary w-full rounded-md border px-3 py-2 focus:ring-2 focus:outline-none"
           />
         </div>
@@ -72,9 +74,10 @@ export const WelcomeView = ({
           <Dropdown
             label="Voice"
             options={[
-              { label: 'Alloy (default)', value: 'alloy' },
-              { label: 'Ava (bright)', value: 'ava' },
-              { label: 'Deep (rich)', value: 'deep' },
+              { label: 'Blake (American male)', value: 'blake' },
+              { label: 'Daniela (Mexican female)', value: 'daniela' },
+              { label: 'Jacqueline (American female)', value: 'jacqueline' },
+              { label: 'Robyn (Australian female)', value: 'robyn' },
             ]}
             value={voice}
             onChange={(v) => onVoiceChange?.(v)}
@@ -99,13 +102,21 @@ export const WelcomeView = ({
               { label: 'Spanish', value: 'es' },
               { label: 'French', value: 'fr' },
               { label: 'German', value: 'de' },
+              { label: 'Ukrainian', value: 'uk' },
             ]}
             value={language}
             onChange={(v) => onLanguageChange?.(v)}
           />
         </div>
 
-        <Button variant="primary" size="lg" onClick={onStartCall} className="mt-6 w-64 font-mono">
+        <Button
+          variant="primary"
+          size="lg"
+          onClick={onStartCall}
+          disabled={!userName || userName.trim().length === 0}
+          title={!userName || userName.trim().length === 0 ? 'Name is required' : undefined}
+          className="mt-6 w-64 font-mono"
+        >
           {startButtonText}
         </Button>
       </section>

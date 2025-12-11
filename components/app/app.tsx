@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { TokenSource } from 'livekit-client';
 import {
   RoomAudioRenderer,
@@ -30,11 +30,22 @@ interface AppProps {
 }
 
 export function App({ appConfig }: AppProps) {
-  const { user } = useAuth();
+  const { user, userSettings } = useAuth();
   const [userName, setUserName] = useState<string>('');
   const [selectedVoice, setSelectedVoice] = useState<string | undefined>(undefined);
   const [selectedPersonality, setSelectedPersonality] = useState<string | undefined>(undefined);
   const [selectedLanguage, setSelectedLanguage] = useState<string | undefined>(undefined);
+
+  // Preload user settings into dropdowns when they become available
+  useEffect(() => {
+    if (userSettings) {
+      if (userSettings.name) setUserName(userSettings.name as string);
+      if (userSettings.voice) setSelectedVoice(userSettings.voice);
+      if (userSettings.personality) setSelectedPersonality(userSettings.personality);
+      if (userSettings.language) setSelectedLanguage(userSettings.language);
+    }
+  }, [userSettings]);
+
   const tokenSource = useMemo(() => {
     const endpoint =
       typeof process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT === 'string'
@@ -58,15 +69,27 @@ export function App({ appConfig }: AppProps) {
           ? process.env.NEXT_PUBLIC_AI_SETTINGS_ENDPOINT
           : 'http://localhost:8080/setAgentConfig';
 
-      const agentEntry: Record<string, unknown> = {
-        agent_name: appConfig.agentName,
-      };
-      if (selectedVoice) agentEntry['voice'] = selectedVoice;
-      if (selectedPersonality) agentEntry['personality'] = selectedPersonality;
-      if (selectedLanguage) agentEntry['language'] = selectedLanguage;
-      if (userName) agentEntry['user_name'] = userName;
+      // Only include an agent when there is at least one meaningful field.
+      const agents: Record<string, unknown>[] = [];
+      const hasMeaningfulAgent = !!(
+        appConfig.agentName ||
+        selectedVoice ||
+        selectedPersonality ||
+        selectedLanguage ||
+        userName
+      );
 
-      const roomConfig = { agents: [agentEntry] };
+      if (hasMeaningfulAgent) {
+        const agentEntry: Record<string, unknown> = {};
+        if (appConfig.agentName) agentEntry['agent_name'] = appConfig.agentName;
+        if (selectedVoice) agentEntry['voice'] = selectedVoice;
+        if (selectedPersonality) agentEntry['personality'] = selectedPersonality;
+        if (selectedLanguage) agentEntry['language'] = selectedLanguage;
+        if (userName) agentEntry['user_name'] = userName;
+        agents.push(agentEntry);
+      }
+
+      const roomConfig = agents.length ? { agents } : {};
       const payload = {
         room_config: roomConfig,
         user_email: user?.email || 'guest@example.com', // Include user email in payload

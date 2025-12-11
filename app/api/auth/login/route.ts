@@ -27,8 +27,9 @@ export async function POST(request: NextRequest) {
     const backendData = await backendRes.json();
     console.log('Backend login response:', backendData);
 
-    // Create a session on the frontend
-    const sessionId = crypto.randomBytes(32).toString('hex');
+    // Use sessionId from backend if provided, otherwise generate one
+    // (Backend should create the session and return the sessionId)
+    const sessionId = backendData.sessionId || backendData.session_id || crypto.randomBytes(32).toString('hex');
 
     const response = NextResponse.json(
       {
