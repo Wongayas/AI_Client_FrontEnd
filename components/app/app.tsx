@@ -12,6 +12,7 @@ import type { AppConfig } from '@/app-config';
 import { ViewController } from '@/components/app/view-controller';
 import { Toaster } from '@/components/livekit/toaster';
 import { useAgentErrors } from '@/hooks/useAgentErrors';
+import { useAuth } from '@/hooks/useAuth';
 import { useDebugMode } from '@/hooks/useDebug';
 import { getSandboxTokenSource } from '@/lib/utils';
 
@@ -29,6 +30,7 @@ interface AppProps {
 }
 
 export function App({ appConfig }: AppProps) {
+  const { user } = useAuth();
   const [userName, setUserName] = useState<string>('');
   const [selectedVoice, setSelectedVoice] = useState<string | undefined>(undefined);
   const [selectedPersonality, setSelectedPersonality] = useState<string | undefined>(undefined);
@@ -65,7 +67,10 @@ export function App({ appConfig }: AppProps) {
       if (userName) agentEntry['user_name'] = userName;
 
       const roomConfig = { agents: [agentEntry] };
-      const payload = { room_config: roomConfig };
+      const payload = {
+        room_config: roomConfig,
+        user_email: user?.email || 'guest@example.com', // Include user email in payload
+      };
 
       try {
         console.log('Sending to backend:', JSON.stringify(payload, null, 2));
@@ -185,7 +190,7 @@ export function App({ appConfig }: AppProps) {
         throw new Error(`Error fetching connection details: ${error}`);
       }
     });
-  }, [appConfig, userName, selectedVoice, selectedPersonality, selectedLanguage]);
+  }, [appConfig, userName, selectedVoice, selectedPersonality, selectedLanguage, user]);
 
   const session = useSession(
     tokenSource,
@@ -210,7 +215,6 @@ export function App({ appConfig }: AppProps) {
       </main>
       <StartAudio label="Start Audio" />
       <RoomAudioRenderer />
-      <Toaster />
     </SessionProvider>
   );
 }
